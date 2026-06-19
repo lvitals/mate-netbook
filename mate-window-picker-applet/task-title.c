@@ -23,6 +23,9 @@
 #define WNCK_I_KNOW_THIS_IS_UNSTABLE
 #include <libwnck/libwnck.h>
 #include <mate-panel-applet.h>
+#ifdef GDK_WINDOWING_X11
+#include <gdk/gdkx.h>
+#endif
 
 #include <math.h>
 
@@ -126,7 +129,12 @@ on_close_clicked (GtkButton *button,
     GdkDisplay *display;
     gdkscreen = gtk_widget_get_screen (GTK_WIDGET (title));
     display = gdk_screen_get_display (gdkscreen);
-    wnck_window_close (window, gdk_x11_display_get_user_time (display));
+#ifdef GDK_WINDOWING_X11
+    if (GDK_IS_X11_DISPLAY (display))
+      wnck_window_close (window, gdk_x11_display_get_user_time (display));
+    else
+#endif
+      wnck_window_close (window, gtk_get_current_event_time ());
     retval = TRUE;
   }
   else if (priv->show_home_title)

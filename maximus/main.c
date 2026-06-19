@@ -92,6 +92,13 @@ gint main (gint argc, gchar *argv[])
   g_option_context_free(context);
 
   gdk_display = gdk_display_get_default ();
+
+  if (!GDK_IS_X11_DISPLAY (gdk_display))
+  {
+    g_warning ("Maximus only supports X11. Exiting gracefully.");
+    return 0;
+  }
+
   gdk_x11_display_error_trap_push (gdk_display);
   app = maximus_app_get_default ();
   gdk_x11_display_error_trap_pop_ignored (gdk_display);
