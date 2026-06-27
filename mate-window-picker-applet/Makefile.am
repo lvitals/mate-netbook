@@ -1,4 +1,5 @@
-libexec_PROGRAMS=mate-window-picker-applet
+appletlibdir = $(libdir)/mate-panel
+appletlib_LTLIBRARIES = libmate-window-picker-applet.la
 
 PKGDATADIR = $(datadir)/mate-window-picker-applet
 AM_CFLAGS=\
@@ -10,13 +11,21 @@ AM_CFLAGS=\
 	-DMATELOCALEDIR=\""$(datadir)/locale"\" \
 	-DPKGDATADIR=\"$(PKGDATADIR)\" \
 	-DMATEWINDOWPICKER_MENU_UI_DIR=\""$(xmluidir)"\" \
+	-DENABLE_IN_PROCESS \
+	-DPANEL_APPLET_FACTORY=MATE_PANEL_APPLET_IN_PROCESS_FACTORY \
 	$(WARN_CFLAGS)
 
-mate_window_picker_applet_LDADD = \
+libmate_window_picker_applet_la_LIBADD = \
 	$(MATEWINDOWPICKER_DEPS_LIBS) \
 	-lm
 
-mate_window_picker_applet_SOURCES = \
+libmate_window_picker_applet_la_LDFLAGS = \
+	-export-dynamic \
+	-module \
+	-avoid-version \
+	-shared
+
+libmate_window_picker_applet_la_SOURCES = \
 	applet.c \
 	task-item.c \
 	task-item.h \
@@ -37,16 +46,7 @@ $(applet_in_files): $(applet_in_files).in Makefile
 $(applet_DATA): $(applet_in_files) Makefile
 	$(AM_V_GEN) $(MSGFMT) --desktop --keyword=Name --keyword=Description --template $< -d $(top_srcdir)/po -o $@
 
-APPLET_LOCATION=$(libexecdir)/mate-window-picker-applet
-
-servicedir       = $(datadir)/dbus-1/services
-service_in_files = org.mate.panel.applet.MateWindowPickerFactory.service.in
-service_DATA     = $(service_in_files:.service.in=.service)
-
-org.mate.panel.applet.MateWindowPickerFactory.service: $(service_in_files)
-	$(AM_V_GEN) $(SED) \
-	-e "s|\@LOCATION\@|$(APPLET_LOCATION)|" \
-	$< > $@
+APPLET_LOCATION=$(libdir)/mate-panel/libmate-window-picker-applet.so
 
 gsettingsschema_in_files = org.mate.panel.applet.mate-window-picker-applet.gschema.xml.in
 
@@ -58,7 +58,6 @@ xmlui_DATA = mate-window-picker-applet-menu.xml
 
 EXTRA_DIST = \
 	$(applet_in_files).in \
-	$(service_in_files) \
 	$(ui_DATA) \
 	$(convert_DATA) \
 	$(gsettingsschema_in_files) \
@@ -68,6 +67,4 @@ CLEANFILES = \
 	$(applet_DATA) \
 	$(applet_in_files) \
 	$(gsettings_SCHEMAS) \
-	*.gschema.valid \
-	$(service_DATA)
-
+	*.gschema.valid

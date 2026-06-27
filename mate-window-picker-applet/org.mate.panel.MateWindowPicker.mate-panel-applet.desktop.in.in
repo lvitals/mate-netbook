@@ -1,6 +1,7 @@
 [Applet Factory]
 Id=MateWindowPickerFactory
 Location=@LOCATION@
+InProcess=true
 Name=Window Picker Applet Factory
 Description=Window Picker
 

@@ -226,11 +226,19 @@ cw_applet_fill (MatePanelApplet *applet,
   return TRUE;
 }
 
+#ifdef ENABLE_IN_PROCESS
+MATE_PANEL_APPLET_IN_PROCESS_FACTORY ("MateWindowPickerFactory",
+                                      PANEL_TYPE_APPLET,
+                                      "MateWindowPicker",
+                                      cw_applet_fill,
+                                      NULL)
+#else
 MATE_PANEL_APPLET_OUT_PROCESS_FACTORY ("MateWindowPickerFactory",
                                        PANEL_TYPE_APPLET,
                                        "MateWindowPicker",
                                        cw_applet_fill,
                                        NULL);
+#endif
 
 static void
 display_about_dialog (GtkAction       *action,
